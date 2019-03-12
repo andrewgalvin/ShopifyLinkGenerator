@@ -48,6 +48,7 @@ public class Main extends Application implements Initializable{
 		try {
 			Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("LinkGenGUI.fxml"));
 			Scene scene = new Scene(root);
+			primaryStage.setTitle("Shopify Link Generator");
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
