@@ -42,6 +42,7 @@ public class Main extends Application implements Initializable{
 	String atcURL;
 	String size;
 	String prodID;
+	String website;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -53,6 +54,7 @@ public class Main extends Application implements Initializable{
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
 			primaryStage.show();
+			//getProduct();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -60,8 +62,10 @@ public class Main extends Application implements Initializable{
 	
 	public void getProduct() throws IOException {
 		Document doc = Jsoup.connect(url).get();
+		System.out.println(website);
 		Elements elements = doc.select("select.no-js > option");
 		prodID = elements.toString();
+		System.out.print(elements);
 		prodID = prodID.substring(prodID.indexOf(size)-16,prodID.indexOf(size)-2);
 		System.out.println(prodID);
 	}
@@ -79,10 +83,11 @@ public class Main extends Application implements Initializable{
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// TODO Auto-generated method stub
 		createButton.setOnMouseClicked(e -> {
+			url = productTextField.getText();
 			size = sizeTextField.getText();
 			size = size.toUpperCase();
 			size = " " + size + " ";
-			url = productTextField.getText();
+			System.out.println(size);
 			try {
 				getProduct();
 			} catch (IOException e1) {
