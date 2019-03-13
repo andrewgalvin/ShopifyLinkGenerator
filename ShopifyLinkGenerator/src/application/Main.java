@@ -2,6 +2,8 @@ package application;
 	
 import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -38,11 +40,11 @@ public class Main extends Application implements Initializable{
 	@FXML
 	private Button openButton;	
 	
-	String url;// = "https://kith.com/collections/mens-footwear-sneakers/products/new-balance-ml1500v1-navy-grey";
-	String atcURL;
+	String siteURL;// = "https://kith.com/collections/mens-footwear-sneakers/products/new-balance-ml1500v1-navy-grey";
+	String atcLink;
 	String size;
 	String prodID;
-	String website;
+	String checkout;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -60,50 +62,43 @@ public class Main extends Application implements Initializable{
 		}
 	}
 	
-	public void getProduct() throws IOException {
-		Document doc = Jsoup.connect(url).get();
-		System.out.println(website);
-		Elements elements = doc.select("select.no-js > option");
-		prodID = elements.toString();
-		System.out.print(elements);
-		prodID = prodID.substring(prodID.indexOf(size)-16,prodID.indexOf(size)-2);
-		System.out.println(prodID);
-	}
-	
-	public void setATC() {
-		atcURL = url.substring(0,url.indexOf(".")+4);
-		atcURL = atcURL + "/cart/" + prodID + ":1";
-		atcTextField.setText(atcURL);
-	}
-	public static void main(String[] args) {
-		launch(args);
-	}
+	  public void getProdID(String sizeCheck) {
+	        try {
+	            Document document = Jsoup.connect((String)this.siteURL).get();
+	            Elements elements = document.select("select.no-js > option");
+	            this.prodID = elements.toString();
+	            this.prodID = this.prodID.substring(this.prodID.indexOf(sizeCheck) - 16, this.prodID.indexOf(sizeCheck) - 2);
+	        }
+	        catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
 
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		// TODO Auto-generated method stub
-		createButton.setOnMouseClicked(e -> {
-			url = productTextField.getText();
-			size = sizeTextField.getText();
-			size = size.toUpperCase();
-			size = " " + size + " ";
-			System.out.println(size);
-			try {
-				getProduct();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			setATC();
-			System.out.println(atcURL);
-		});
-		
-		openButton.setOnMouseClicked(e -> {
-			try {
-				Desktop.getDesktop().browse(new URL(atcURL).toURI());
-			}catch(Exception e1) {
-				e1.printStackTrace();
-			}
-		});
-		
+	    public void initialize(URL location, ResourceBundle resources) {
+	        this.createButton.setOnMouseClicked(e -> {
+	            this.size = this.sizeTextField.getText();
+	            this.size.toUpperCase();
+	            this.size = " " + this.size + " ";
+	            this.siteURL = this.productTextField.getText();
+	            int start = this.siteURL.indexOf(".");
+	            this.getProdID(this.size);
+	            this.atcLink = String.valueOf(this.siteURL.substring(0, start += 4)) + "/cart/" + this.prodID + ":1";
+	            this.atcTextField.setText(this.atcLink);
+	        });
+	        this.openButton.setOnMouseClicked(e -> {
+	            try {
+	                Desktop d = Desktop.getDesktop();
+	                if (this.atcLink == null) {
+	                    this.atcLink = "https://google.com";
+	                }
+	                d.browse(new URI(this.atcLink));
+	            }
+	            catch (IOException e1) {
+	                e1.printStackTrace();
+	            }
+	            catch (URISyntaxException e1) {
+	                e1.printStackTrace();
+	            }
+	        });
+	    }
 	}
-}
